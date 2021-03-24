@@ -8,6 +8,7 @@
 #include <future>
 #include <memory>
 #include <mavsdk_interface/gpsPos.h>
+#include <mavsdk_interface/battery.h>
 
 #define ROS_RATE 30
 
@@ -24,6 +25,7 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
 
     ros::Publisher posGPS_pub = nh.advertise<mavsdk_interface::gpsPos>("mavsdk/gpsPos", 100);
+    ros::Publisher battery_pub = nh.advertise<mavsdk_interface::battery>("mavsdk/battery", 100);
 
     ros::Rate loop_rate(ROS_RATE);
 
@@ -96,6 +98,12 @@ int main(int argc, char** argv)
         posGPS_pub.publish(msg);
     });
 
+    telemetry.subscribe_battery([&](mavsdk::Telemetry::Battery batt){
+        mavsdk_interface::battery msg;
+        msg.voltage_v = batt.voltage_v;
+        msg.remaining_percent = batt.remaining_percent;
+        battery_pub.publish(msg);
+    });
     ros::spin();
 
     return 0;

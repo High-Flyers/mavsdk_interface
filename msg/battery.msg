@@ -1,0 +1,2 @@
+float32 voltage_v
+float32 remaining_percent
