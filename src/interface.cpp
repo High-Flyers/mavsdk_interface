@@ -9,6 +9,9 @@
 #include <memory>
 #include <mavsdk_interface/gpsPos.h>
 #include <mavsdk_interface/battery.h>
+#include <nav_msgs/Odometry.h>
+
+#include "InformationDistributor.h"
 
 #define ROS_RATE 30
 
@@ -26,10 +29,10 @@ int main(int argc, char** argv)
 
     ros::Publisher posGPS_pub = nh.advertise<mavsdk_interface::gpsPos>("mavsdk/gpsPos", 100);
     ros::Publisher battery_pub = nh.advertise<mavsdk_interface::battery>("mavsdk/battery", 100);
+    ros::Publisher odo_pub = nh.advertise<nav_msgs::Odometry>("mavsdk/odometry", 100);
 
     ros::Rate loop_rate(ROS_RATE);
-
-    // MAVSDK SETUP --------
+    
     mavsdk::Mavsdk mavsdk;
     mavsdk::ConnectionResult connection_result = mavsdk.add_any_connection(argv[1]);
     if(connection_result != mavsdk::ConnectionResult::Success) {
@@ -72,7 +75,7 @@ int main(int argc, char** argv)
                 }
             }
             std::cerr << "Failed to filter 255" << std::endl;
-            return 0;
+            return 1;
         }
         else
         {
@@ -83,27 +86,30 @@ int main(int argc, char** argv)
     end_connect:
 
     auto system = mavsdk.systems().at(0);
+    /*auto system = getMavsdkSystem(loop_rate, argv);
+    if(system == nullptr){
+        return 1;
+    }*/
     auto telemetry = mavsdk::Telemetry{system};
-
-    // END MAVSDK SETUP --------
 
     
 
-    telemetry.subscribe_position([&](mavsdk::Telemetry::Position pos){
+    
+    InformationDistributor distibutor;
+    distibutor.subcribePosition(posGPS_pub, telemetry);
+    distibutor.subcribeBattery(battery_pub, telemetry);
+    distibutor.subcribeOdometry(odo_pub, telemetry);
+
+    /*telemetry.subscribe_position([&](mavsdk::Telemetry::Position pos){
         mavsdk_interface::gpsPos msg;
         msg.latitude_deg = pos.latitude_deg;
         msg.longitude_deg = pos.longitude_deg;
         msg.absolute_altidue_m = pos.absolute_altitude_m;
         msg.relative_altitude_m = pos.relative_altitude_m;
         posGPS_pub.publish(msg);
-    });
+    });*/
 
-    telemetry.subscribe_battery([&](mavsdk::Telemetry::Battery batt){
-        mavsdk_interface::battery msg;
-        msg.voltage_v = batt.voltage_v;
-        msg.remaining_percent = batt.remaining_percent;
-        battery_pub.publish(msg);
-    });
+    
     ros::spin();
 
     return 0;
