@@ -10,7 +10,7 @@
 #include <mavsdk_interface/gpsPos.h>
 #include <mavsdk_interface/battery.h>
 #include <nav_msgs/Odometry.h>
-
+#include <mavsdk_interface/velocityNedPos.h>
 
 class InformationDistributor {
 public:
@@ -59,6 +59,19 @@ public:
             msg.twist.twist.linear.z = (double)odo.velocity_body.z_m_s;
             odometry_pub.publish(msg);
 
+        });
+    }
+
+    void subcribePositionVelocityNed(ros::Publisher& velNedPos_pub, mavsdk::Telemetry & telemetry){
+        telemetry.subscribe_position_velocity_ned([&](mavsdk::Telemetry::PositionVelocityNed velNedPos){
+            mavsdk_interface::velocityNedPos msg;
+            msg.down_m = velNedPos.position.down_m;
+            msg.east_m = velNedPos.position.east_m;
+            msg.north_m = velNedPos.position.north_m;
+            msg.down_m_s = velNedPos.velocity.down_m_s;
+            msg.east_m_s = velNedPos.velocity.east_m_s;
+            msg.north_m_s = velNedPos.velocity.north_m_s;
+            velNedPos_pub.publish(msg);
         });
     }
 };

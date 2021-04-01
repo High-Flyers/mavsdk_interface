@@ -14,6 +14,7 @@ add_message_files(
   FILES
   gpsPos.msg
   battery.msg
+  velocityNedPos.msg
 )
 
 generate_messages(
