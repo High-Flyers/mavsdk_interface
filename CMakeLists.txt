@@ -15,6 +15,7 @@ add_message_files(
   gpsPos.msg
   battery.msg
   velocityNedPos.msg
+  flightMode.msg
 )
 
 generate_messages(
@@ -35,4 +36,6 @@ find_package(MAVSDK REQUIRED)
 
 add_executable(node src/interface.cpp)
 add_dependencies(node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(node ${catkin_LIBRARIES} MAVSDK::mavsdk  MAVSDK::mavsdk_telemetry)
+target_link_libraries(node ${catkin_LIBRARIES} 
+                      MAVSDK::mavsdk  
+                      MAVSDK::mavsdk_telemetry)

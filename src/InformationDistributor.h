@@ -11,6 +11,7 @@
 #include <mavsdk_interface/battery.h>
 #include <nav_msgs/Odometry.h>
 #include <mavsdk_interface/velocityNedPos.h>
+#include <mavsdk_interface/flightMode.h>
 
 class InformationDistributor {
 public:
@@ -72,6 +73,64 @@ public:
             msg.east_m_s = velNedPos.velocity.east_m_s;
             msg.north_m_s = velNedPos.velocity.north_m_s;
             velNedPos_pub.publish(msg);
+        });
+    }
+
+    void subcribeFlightMode(ros::Publisher& flightMode_pub, mavsdk::Telemetry & telemetry){
+        telemetry.subscribe_flight_mode([&](mavsdk::Telemetry::FlightMode flightMode){
+            mavsdk_interface::flightMode msg;
+            switch (flightMode)
+            {
+            case mavsdk::Telemetry::FlightMode::Unknown:
+                msg.flight_mode = "Unknown";
+                break;
+            case mavsdk::Telemetry::FlightMode::Ready:
+                msg.flight_mode = "Ready";
+                break;
+            case mavsdk::Telemetry::FlightMode::Takeoff:
+                msg.flight_mode = "Takeoff";
+                break;
+            case mavsdk::Telemetry::FlightMode::Hold:
+                msg.flight_mode = "Hold";
+                break;
+            case mavsdk::Telemetry::FlightMode::Mission:
+                msg.flight_mode = "Mission";
+                break;
+            case mavsdk::Telemetry::FlightMode::ReturnToLaunch:
+                msg.flight_mode = "ReturnToLaunch";
+                break;
+            case mavsdk::Telemetry::FlightMode::Land:
+                msg.flight_mode = "Land";
+                break;
+            case mavsdk::Telemetry::FlightMode::Offboard:
+                msg.flight_mode = "Offboard";
+                break;
+            case mavsdk::Telemetry::FlightMode::FollowMe:
+                msg.flight_mode = "FollowMe";
+                break;
+            case mavsdk::Telemetry::FlightMode::Manual:
+                msg.flight_mode = "Manual";
+                break;
+            case mavsdk::Telemetry::FlightMode::Altctl:
+                msg.flight_mode = "Altctl";
+                break;
+            case mavsdk::Telemetry::FlightMode::Posctl:
+                msg.flight_mode = "Posctl";
+                break;
+            case mavsdk::Telemetry::FlightMode::Acro:
+                msg.flight_mode = "Acro";
+                break;
+            case mavsdk::Telemetry::FlightMode::Stabilized:
+                msg.flight_mode = "Stabilized";
+                break;
+            case mavsdk::Telemetry::FlightMode::Rattitude:
+                msg.flight_mode = "Rattitude";
+                break;
+            default:
+                msg.flight_mode = "WTF?";
+                break;
+            }
+            flightMode_pub.publish(msg);
         });
     }
 };
