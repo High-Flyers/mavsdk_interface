@@ -10,8 +10,16 @@
 #include <nav_msgs/Odometry.h>
 #include "InformationDistributor.h"
 #include "mavsdkUtils.hpp"
+#include <actionlib/server/simple_action_server.h>
+#include <mavsdk_interface/flyAction.h>
 
 #define ROS_RATE 30
+
+
+void execute(const mavsdk_interface::flyGoalConstPtr& goal, actionlib::SimpleActionServer<mavsdk_interface::flyAction>* Server) 
+{
+    Server->setSucceeded();
+}
 
 int main(int argc, char** argv)
 {
@@ -30,6 +38,8 @@ int main(int argc, char** argv)
     ros::Publisher velNedPos_pub = nh.advertise<mavsdk_interface::velocityNedPos>("mavsdk/velocityNedPos", 100);
     ros::Publisher flightMode_pub = nh.advertise<mavsdk_interface::flightMode>("mavsdk/flightMode", 100);
   
+    actionlib::SimpleActionServer<mavsdk_interface::flyAction> flyServer(nh, "mavsdk/fly", boost::bind(&execute, _1, &flyServer), false);
+
     ros::Rate loop_rate(ROS_RATE);
     
     mavsdk::Mavsdk mavsdk;
@@ -47,6 +57,7 @@ int main(int argc, char** argv)
     distibutor.subcribePositionVelocityNed(velNedPos_pub, telemetry);
     distibutor.subcribeFlightMode(flightMode_pub, telemetry);
     
+    flyServer.start();
     ros::spin();
     return 0;
 }
