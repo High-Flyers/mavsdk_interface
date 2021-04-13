@@ -43,20 +43,20 @@ public:
             nav_msgs::Odometry msg;
             msg.pose.pose.orientation.w = (double)odo.q.w;
             msg.pose.pose.orientation.x = (double)odo.q.x;
-            msg.pose.pose.orientation.y = (double)odo.q.y;
-            msg.pose.pose.orientation.z = (double)odo.q.z;
+            msg.pose.pose.orientation.y = -(double)odo.q.y;
+            msg.pose.pose.orientation.z = -(double)odo.q.z;
             msg.pose.pose.position.x = (double)odo.position_body.x_m;
-            msg.pose.pose.position.y = (double)odo.position_body.y_m;
-            msg.pose.pose.position.z = (double)odo.position_body.z_m;
+            msg.pose.pose.position.y = -(double)odo.position_body.y_m;
+            msg.pose.pose.position.z = -(double)odo.position_body.z_m;
             for(int i = 0; i < 36; i++){
                 msg.pose.covariance[i] = (double)odo.pose_covariance.covariance_matrix[i];
                 msg.twist.covariance[i] = (double)odo.velocity_covariance.covariance_matrix[i];
             }
-            msg.twist.twist.angular.x = (double)odo.angular_velocity_body.roll_rad_s;
-            msg.twist.twist.angular.y = (double)odo.angular_velocity_body.pitch_rad_s;
+            msg.twist.twist.angular.x = -(double)odo.angular_velocity_body.roll_rad_s;
+            msg.twist.twist.angular.y = -(double)odo.angular_velocity_body.pitch_rad_s;
             msg.twist.twist.angular.z = (double)odo.angular_velocity_body.yaw_rad_s;
-            msg.twist.twist.linear.x = (double)odo.velocity_body.x_m_s;
-            msg.twist.twist.linear.y = (double)odo.velocity_body.y_m_s;
+            msg.twist.twist.linear.x = -(double)odo.velocity_body.x_m_s;
+            msg.twist.twist.linear.y = -(double)odo.velocity_body.y_m_s;
             msg.twist.twist.linear.z = (double)odo.velocity_body.z_m_s;
             odometry_pub.publish(msg);
 
