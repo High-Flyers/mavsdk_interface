@@ -1,6 +1,0 @@
-# Define the goal
-uint32 udp_port  # Specify which dishwasher we want to use
----
-string isSuccess
----
-float32 percent

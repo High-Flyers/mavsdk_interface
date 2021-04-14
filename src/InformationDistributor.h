@@ -18,8 +18,8 @@ public:
     InformationDistributor() {};
     ~InformationDistributor() {};
 
-    void subcribePosition(ros::Publisher& posGPS_pub, mavsdk::Telemetry & telemetry){
-        telemetry.subscribe_position([&](mavsdk::Telemetry::Position pos){
+    void subcribePosition(ros::Publisher& posGPS_pub, std::shared_ptr<mavsdk::Telemetry> telemetry){
+        telemetry->subscribe_position([&](mavsdk::Telemetry::Position pos){
             mavsdk_interface::gpsPos msg;
             msg.latitude_deg = pos.latitude_deg;
             msg.longitude_deg = pos.longitude_deg;
@@ -29,8 +29,8 @@ public:
         });
     }
 
-    void subcribeBattery(ros::Publisher& battery_pub, mavsdk::Telemetry & telemetry){
-        telemetry.subscribe_battery([&](mavsdk::Telemetry::Battery batt){
+    void subcribeBattery(ros::Publisher& battery_pub, std::shared_ptr<mavsdk::Telemetry>  telemetry){
+        telemetry->subscribe_battery([&](mavsdk::Telemetry::Battery batt){
             mavsdk_interface::battery msg;
             msg.voltage_v = batt.voltage_v;
             msg.remaining_percent = batt.remaining_percent;
@@ -38,8 +38,8 @@ public:
         });
     }
 
-    void subcribeOdometry(ros::Publisher& odometry_pub, mavsdk::Telemetry & telemetry){
-        telemetry.subscribe_odometry([&](mavsdk::Telemetry::Odometry odo){
+    void subcribeOdometry(ros::Publisher& odometry_pub, std::shared_ptr<mavsdk::Telemetry> telemetry){
+        telemetry->subscribe_odometry([&](mavsdk::Telemetry::Odometry odo){
             nav_msgs::Odometry msg;
             msg.pose.pose.orientation.w = (double)odo.q.w;
             msg.pose.pose.orientation.x = (double)odo.q.x;
@@ -63,8 +63,8 @@ public:
         });
     }
 
-    void subcribePositionVelocityNed(ros::Publisher& velNedPos_pub, mavsdk::Telemetry & telemetry){
-        telemetry.subscribe_position_velocity_ned([&](mavsdk::Telemetry::PositionVelocityNed velNedPos){
+    void subcribePositionVelocityNed(ros::Publisher& velNedPos_pub, std::shared_ptr<mavsdk::Telemetry> telemetry){
+        telemetry->subscribe_position_velocity_ned([&](mavsdk::Telemetry::PositionVelocityNed velNedPos){
             mavsdk_interface::velocityNedPos msg;
             msg.down_m = velNedPos.position.down_m;
             msg.east_m = velNedPos.position.east_m;
@@ -76,8 +76,8 @@ public:
         });
     }
 
-    void subcribeFlightMode(ros::Publisher& flightMode_pub, mavsdk::Telemetry & telemetry){
-        telemetry.subscribe_flight_mode([&](mavsdk::Telemetry::FlightMode flightMode){
+    void subcribeFlightMode(ros::Publisher& flightMode_pub, std::shared_ptr<mavsdk::Telemetry> telemetry){
+        telemetry->subscribe_flight_mode([&](mavsdk::Telemetry::FlightMode flightMode){
             mavsdk_interface::flightMode msg;
             switch (flightMode)
             {
