@@ -13,6 +13,7 @@
 #include <mavsdk_interface/flightMode.h>
 #include <mavsdk_interface/arm.h>
 #include <mavsdk_interface/takeoff.h>
+#include <mavsdk_interface/kill.h>
 
 #include "mavsdkUtils.hpp"
 #include "InformationDistributor.h"
@@ -38,6 +39,7 @@ private:
 
     ros::ServiceServer arm_srv;
     ros::ServiceServer takeoff_srv;
+    ros::ServiceServer kill_srv;
     
 public:
     Interface(ros::NodeHandle &nh, std::string udp);
@@ -45,6 +47,7 @@ public:
 
     bool isArmed(mavsdk_interface::arm::Request &req, mavsdk_interface::arm::Response &res);
     bool takeoff(mavsdk_interface::takeoff::Request &req, mavsdk_interface::takeoff::Response &res);
+    bool kill(mavsdk_interface::kill::Request &req, mavsdk_interface::kill::Response &res);
 };
 
 Interface::Interface(ros::NodeHandle &nh, std::string udp) 
@@ -57,7 +60,7 @@ Interface::Interface(ros::NodeHandle &nh, std::string udp)
 
     arm_srv = nh.advertiseService("mavsdk/service/arm", &Interface::isArmed, this);
     takeoff_srv = nh.advertiseService("mavsdk/service/takeoff", &Interface::takeoff, this);
-
+    kill_srv = nh.advertiseService("mavsdk/service/kill", &Interface::kill, this);
 
     auto system = ConnectToDrone(mavsdk, udp);
 
@@ -92,6 +95,17 @@ bool Interface::takeoff(mavsdk_interface::takeoff::Request &req, mavsdk_interfac
     }
     return 1;
 }
+
+
+bool Interface::kill(mavsdk_interface::kill::Request &req, mavsdk_interface::kill::Response &res)
+{
+    const mavsdk::Action::Result kill_result = this->action->kill();
+    if(kill_result != mavsdk::Action::Result::Success){
+        return 0;
+    }
+    return 1;
+}
+
 int main(int argc, char** argv)
 {
     if(argc != 2)

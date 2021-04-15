@@ -22,6 +22,7 @@ add_service_files(
   FILES
   arm.srv
   takeoff.srv
+  kill.srv
 )
 
 generate_messages(
