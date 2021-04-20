@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   nav_msgs
+  tf
   message_generation
 )
 
@@ -42,6 +43,7 @@ include_directories(
 find_package(MAVSDK REQUIRED)
 
 add_executable(node src/Interface.cpp)
+add_executable(node_base_link_tf src/base_link_tf.cpp)
 add_executable(node_client src/InterfaceClient.cpp)
 
 
@@ -58,3 +60,5 @@ target_link_libraries(node ${catkin_LIBRARIES}
 
 target_link_libraries(node_client ${catkin_LIBRARIES}
                       MAVSDK::mavsdk)
+
+target_link_libraries(node_base_link_tf ${catkin_LIBRARIES} )
