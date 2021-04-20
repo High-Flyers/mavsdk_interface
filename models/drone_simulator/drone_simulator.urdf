@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot name="origins">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        
+        <mesh filename="package://mavsdk_interface/models/drone_simulator/dron_pbl.dae"
+                scale="0.001 0.001 0.001"/>
+      </geometry>
+       <origin rpy="1.57 0 1.57" xyz="0 0 0"/>
+    </visual>
+  </link>
+
+  <link name="camera_link">
+    <visual>
+      <geometry>
+        <box size="0.02 0.1 0.02"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
+  </link>
+
+  <link name="range_finder">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
+  </link>
+
+  <joint name="base_depth_camera" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="0.1 0 0.4" rpy="-0.785 0 -1.57"/>
+    <!-- <origin xyz="0.1 0 0.4" rpy="0 -0.785 0"/> -->
+  </joint>
+
+  <joint name="base_range_finder" type="fixed">
+    <parent link="base_link"/>
+    <child link="range_finder"/>
+    <origin xyz="-0.1 0 0.35" rpy="0 3.14 0"/>
+  </joint>
+
+</robot>
