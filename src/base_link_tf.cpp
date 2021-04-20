@@ -21,7 +21,7 @@ void odomCallback(const nav_msgs::Odometry& odom)
         odom.pose.pose.orientation.w
     );
     transform.setRotation(q);
-    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "base_link"));
+    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "odom", "base_link"));
 }
 
 

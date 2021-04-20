@@ -13,4 +13,5 @@
   <node name="base_link_tf" pkg="mavsdk_interface" type="node_base_link_tf" output="log">
     <param name="odom" type="str" value="/mavsdk_node/mavsdk/odometry"/>
   </node>
+  <node name="map_odom_tf" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 map odom 50"/>
 </launch>
