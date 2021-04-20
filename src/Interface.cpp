@@ -108,16 +108,21 @@ bool Interface::kill(mavsdk_interface::kill::Request &req, mavsdk_interface::kil
 
 int main(int argc, char** argv)
 {
-    if(argc != 2)
+    ros::init(argc, argv, "t_mavsdk_node");
+    ros::NodeHandle nh("~");
+
+    // default port
+    std::string port = "udp://:14540";
+    nh.getParam("mavlink_port", port);
+    
+    if(port == "")
     {
         std::cerr << "SPECIFY THE BIND ADDRESS\n";
         return 1;
     }
+    ROS_INFO("Using mavlink_port: %s", port.c_str());
 
-    ros::init(argc, argv, "t_mavsdk_node");
-    ros::NodeHandle nh;
-
-    Interface Interface(nh, argv[1]);
+    Interface Interface(nh, port);
   
     ros::Rate loop_rate(ROS_RATE);
     
@@ -126,3 +131,4 @@ int main(int argc, char** argv)
     return 0;
 }
 
+    
