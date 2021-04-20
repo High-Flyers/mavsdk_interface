@@ -1,0 +1,16 @@
+<launch>
+  <!-- Load the urdf into the parameter server. -->
+  <param name="my_robot_description" textfile="$(find mavsdk_interface)/models/drone_simulator/drone_simulator.urdf"/>
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_st_pub" >
+    <remap from="robot_description" to="my_robot_description" />
+    <remap from="joint_states" to="different_joint_states" />
+  </node>
+
+  <node name="mavsdk_node" pkg="mavsdk_interface" type="node" output="screen">
+    <param name="mavlink_port" type="str" value="udp://:14540"/>
+  </node>
+  <node name="base_link_tf" pkg="mavsdk_interface" type="node_base_link_tf" output="log">
+    <param name="odom" type="str" value="/mavsdk_node/mavsdk/odometry"/>
+  </node>
+</launch>
