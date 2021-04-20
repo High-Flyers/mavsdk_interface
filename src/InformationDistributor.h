@@ -12,6 +12,8 @@
 #include <nav_msgs/Odometry.h>
 #include <mavsdk_interface/velocityNedPos.h>
 #include <mavsdk_interface/flightMode.h>
+#include <limits>
+#include <math.h>
 
 class InformationDistributor {
 public:
@@ -40,7 +42,13 @@ public:
 
     void subcribeOdometry(ros::Publisher& odometry_pub, std::shared_ptr<mavsdk::Telemetry> telemetry){
         telemetry->subscribe_odometry([&](mavsdk::Telemetry::Odometry odo){
+            static uint32_t seq = 0;
             nav_msgs::Odometry msg;
+            msg.header.seq = seq++;
+            msg.header.stamp = ros::Time::now();
+            msg.header.frame_id = "odom";
+            msg.child_frame_id = "base_link";
+
             msg.pose.pose.orientation.w = (double)odo.q.w;
             msg.pose.pose.orientation.x = (double)odo.q.x;
             msg.pose.pose.orientation.y = -(double)odo.q.y;
@@ -49,8 +57,10 @@ public:
             msg.pose.pose.position.y = -(double)odo.position_body.y_m;
             msg.pose.pose.position.z = -(double)odo.position_body.z_m;
             for(int i = 0; i < 36; i++){
-                msg.pose.covariance[i] = (double)odo.pose_covariance.covariance_matrix[i];
-                msg.twist.covariance[i] = (double)odo.velocity_covariance.covariance_matrix[i];
+                // rtab_map has problem with covariance matrices so for now they are ignored.
+                // TODO: find out why!!
+                msg.pose.covariance[i]  = 0.0f;//(double)odo.pose_covariance.covariance_matrix[i];
+                msg.twist.covariance[i] = 0.0f;//(double)odo.velocity_covariance.covariance_matrix[i];
             }
             msg.twist.twist.angular.x = -(double)odo.angular_velocity_body.roll_rad_s;
             msg.twist.twist.angular.y = -(double)odo.angular_velocity_body.pitch_rad_s;
