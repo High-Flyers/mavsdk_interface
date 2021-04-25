@@ -42,7 +42,8 @@ include_directories(
 
 find_package(MAVSDK REQUIRED)
 
-add_executable(node src/Interface.cpp)
+add_executable(node src/Interface.cpp
+                src/InformationDistributor.cpp)
 add_executable(node_base_link_tf src/base_link_tf.cpp)
 add_executable(node_client src/InterfaceClient.cpp)
 
