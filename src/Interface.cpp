@@ -19,11 +19,13 @@ Interface::Interface(ros::NodeHandle &nh, std::string udp)
     arm_srv = nh.advertiseService("mavsdk/service/arm", &Interface::isArmed, this);
     takeoff_srv = nh.advertiseService("mavsdk/service/takeoff", &Interface::takeoff, this);
     kill_srv = nh.advertiseService("mavsdk/service/kill", &Interface::kill, this);
+    go_srv = nh.advertiseService("mavsdk/service/go", &Interface::go, this);
 
     auto system = ConnectToDrone(mavsdk, udp);
 
     telemetry = std::make_shared<mavsdk::Telemetry>(system);
     action = std::make_shared<mavsdk::Action>(system);
+    offboard = std::make_shared<mavsdk::Offboard>(system);
 
     distibutor.subcribePosition(posGPS_pub, telemetry);
     distibutor.subcribeBattery(battery_pub, telemetry);
@@ -63,6 +65,21 @@ bool Interface::kill(mavsdk_interface::kill::Request &req, mavsdk_interface::kil
     }
     return 1;
 }
+
+
+bool Interface::go(mavsdk_interface::go::Request &req, mavsdk_interface::go::Response &res)
+{
+    
+    this->offboard->set_velocity_body({0.0f, 0.0f, 0.0f, 0.0f});
+
+    // Start offboard mode.
+    mavsdk::Offboard::Result offboard_result = this->offboard->start();
+    if (offboard_result != mavsdk::Offboard::Result::Success) {
+            std::cerr << "Offboard::start() failed: " << offboard_result << '\n';
+    }
+
+}
+
 
 int main(int argc, char** argv)
 {

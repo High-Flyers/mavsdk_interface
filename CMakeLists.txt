@@ -24,6 +24,7 @@ add_service_files(
   arm.srv
   takeoff.srv
   kill.srv
+  go.srv
 )
 
 generate_messages(
@@ -56,7 +57,8 @@ add_dependencies(node_client ${catkin_EXPORTED_TARGETS})
 target_link_libraries(node ${catkin_LIBRARIES} 
                       MAVSDK::mavsdk  
                       MAVSDK::mavsdk_telemetry
-                      MAVSDK::mavsdk_action)
+                      MAVSDK::mavsdk_action
+                      MAVSDK::mavsdk_offboard)
 
 
 target_link_libraries(node_client ${catkin_LIBRARIES}

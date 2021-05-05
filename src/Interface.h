@@ -7,6 +7,7 @@
 #include <mavsdk/mavsdk.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
 #include <mavsdk/plugins/action/action.h>
+#include <mavsdk/plugins/offboard/offboard.h>
 #include <exception>
 #include <memory>
 #include <nav_msgs/Odometry.h>
@@ -17,6 +18,7 @@
 #include <mavsdk_interface/arm.h>
 #include <mavsdk_interface/takeoff.h>
 #include <mavsdk_interface/kill.h>
+#include <mavsdk_interface/go.h>
 
 #include "mavsdkUtils.hpp"
 #include "InformationDistributor.h"
@@ -35,10 +37,12 @@ private:
 
     std::shared_ptr<mavsdk::Telemetry> telemetry;
     std::shared_ptr<mavsdk::Action> action;
+    std::shared_ptr<mavsdk::Offboard> offboard;
 
     ros::ServiceServer arm_srv;
     ros::ServiceServer takeoff_srv;
     ros::ServiceServer kill_srv;
+    ros::ServiceServer go_srv;
 
 public:
     Interface(ros::NodeHandle &nh, std::string udp);
@@ -47,6 +51,7 @@ public:
     bool isArmed(mavsdk_interface::arm::Request &req, mavsdk_interface::arm::Response &res);
     bool takeoff(mavsdk_interface::takeoff::Request &req, mavsdk_interface::takeoff::Response &res);
     bool kill(mavsdk_interface::kill::Request &req, mavsdk_interface::kill::Response &res);
+    bool go(mavsdk_interface::go::Request &req, mavsdk_interface::go::Response &res);
 };
 
 #endif
