@@ -49,9 +49,9 @@ add_executable(node_base_link_tf src/base_link_tf.cpp)
 add_executable(node_client src/InterfaceClient.cpp)
 
 
-add_dependencies(node ${catkin_EXPORTED_TARGETS})
+add_dependencies(node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_dependencies(node_client ${catkin_EXPORTED_TARGETS})
+add_dependencies(node_client ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 target_link_libraries(node ${catkin_LIBRARIES} 
