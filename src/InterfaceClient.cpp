@@ -49,10 +49,10 @@ bool InterfaceClient::call(char **argv)
             ROS_ERROR("Error");
             return 1;
         }
-        go_srv.request.x = argv[2];
-        go_srv.request.y = argv[3];
-        go_srv.request.z = argv[4];
-        go_srv.request.yaw = argv[5];
+        go_srv.request.x = std::atoi(argv[2]);
+        go_srv.request.y = std::atoi(argv[3]);
+        go_srv.request.z = std::atoi(argv[4]);
+        go_srv.request.yaw = std::atoi(argv[5]);
         if (go_clt.call(go_srv))
         {
             ROS_INFO("GOOD JOB, DRONE IS GOING SOMEWHERE....?");
