@@ -30,7 +30,7 @@ public:
     InterfaceClient(ros::NodeHandle nh);
     ~InterfaceClient();
 
-    bool call(std::string arg);
+    bool call(char **argv);
 };
 
 #endif

@@ -70,7 +70,8 @@ bool Interface::kill(mavsdk_interface::kill::Request &req, mavsdk_interface::kil
 bool Interface::go(mavsdk_interface::go::Request &req, mavsdk_interface::go::Response &res)
 {
     
-    this->offboard->set_velocity_body({0.0f, 0.0f, 0.0f, 0.0f});
+    this->offboard->set_velocity_body({req.x, req.y, req.z, req.yaw});
+    
 
     // Start offboard mode.
     mavsdk::Offboard::Result offboard_result = this->offboard->start();

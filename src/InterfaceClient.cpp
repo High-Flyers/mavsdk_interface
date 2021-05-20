@@ -15,12 +15,10 @@ InterfaceClient::~InterfaceClient()
 {
 }
 
-bool InterfaceClient::call(std::string arg)
+bool InterfaceClient::call(char **argv)
 {
-    ROS_INFO("HERE");
-    if (arg == "arm")
+    if (argv[1] == "arm")
     {
-         ROS_INFO("HERE");
         arm_srv.request.str1 = "EXECUTE ORDER 66";
         if (arm_clt.call(arm_srv))
         {
@@ -28,7 +26,7 @@ bool InterfaceClient::call(std::string arg)
             return 0;
         }
     }
-    if (arg == "takeoff")
+    if (argv[1] == "takeoff")
     {
         takeoff_srv.request.str11 = "FLY";
         if (takeoff_clt.call(takeoff_srv))
@@ -37,7 +35,7 @@ bool InterfaceClient::call(std::string arg)
             return 0;
         }
     }
-    if (arg == "kill")
+    if (argv[1] == "kill")
     {
         kill_srv.request.str1 = "Do it Anakin, KILL HIM NOW";
         if (kill_clt.call(kill_srv))
@@ -46,8 +44,15 @@ bool InterfaceClient::call(std::string arg)
             return 0;
         }
     }
-    if(arg == "go"){
-        go_srv.request.str1 = "LET'S GO";
+    if(argv[1] == "go"){
+        if(sizeof(*argv) != 6){
+            ROS_ERROR("Error");
+            return 1;
+        }
+        go_srv.request.x = argv[2];
+        go_srv.request.y = argv[3];
+        go_srv.request.z = argv[4];
+        go_srv.request.yaw = argv[5];
         if (go_clt.call(go_srv))
         {
             ROS_INFO("GOOD JOB, DRONE IS GOING SOMEWHERE....?");
@@ -62,10 +67,11 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "interface_client");
     ros::NodeHandle nh;
     InterfaceClient client(nh);
+    
     ROS_INFO(argv[1]);
-    if (client.call(argv[1]))
+    if (client.call(argv))
     {
-        ROS_ERROR("YOU DUMB BITCH");
+        ROS_ERROR("Error");
         return 1;
     }
     return 0;
