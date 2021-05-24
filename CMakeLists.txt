@@ -25,6 +25,7 @@ add_service_files(
   takeoff.srv
   kill.srv
   go.srv
+  stopOffboard.srv
 )
 
 generate_messages(

@@ -25,11 +25,14 @@ private:
     mavsdk_interface::takeoff takeoff_srv;
     mavsdk_interface::kill kill_srv;
     mavsdk_interface::go go_srv;
+private:
+    bool wait_for_call(ros::ServiceClient call);
 
 public:
     InterfaceClient(ros::NodeHandle nh);
     ~InterfaceClient();
 
+    bool prepare_calls();
     bool call(char **argv);
 };
 

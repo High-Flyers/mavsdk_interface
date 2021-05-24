@@ -19,6 +19,7 @@
 #include <mavsdk_interface/takeoff.h>
 #include <mavsdk_interface/kill.h>
 #include <mavsdk_interface/go.h>
+#include <mavsdk_interface/stopOffboard.h>
 
 #include "mavsdkUtils.hpp"
 #include "InformationDistributor.h"
@@ -43,6 +44,10 @@ private:
     ros::ServiceServer takeoff_srv;
     ros::ServiceServer kill_srv;
     ros::ServiceServer go_srv;
+    ros::ServiceServer stopOffboard_srv;
+
+private:
+    bool isOffboard = false;
 
 public:
     Interface(ros::NodeHandle &nh, std::string udp);
@@ -52,6 +57,7 @@ public:
     bool takeoff(mavsdk_interface::takeoff::Request &req, mavsdk_interface::takeoff::Response &res);
     bool kill(mavsdk_interface::kill::Request &req, mavsdk_interface::kill::Response &res);
     bool go(mavsdk_interface::go::Request &req, mavsdk_interface::go::Response &res);
+    bool stopOffboard(mavsdk_interface::stopOffboard::Request &req, mavsdk_interface::stopOffboard::Response &res);
 };
 
 #endif

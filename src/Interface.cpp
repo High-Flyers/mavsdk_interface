@@ -4,22 +4,23 @@
 #include "Interface.h"
 
 
-#define ROS_RATE 30
+#define ROS_RATE 60
 
 
 
 Interface::Interface(ros::NodeHandle &nh, std::string udp) 
 {
-    posGPS_pub = nh.advertise<mavsdk_interface::gpsPos>("mavsdk/gpsPos", 100);
-    battery_pub  = nh.advertise<mavsdk_interface::battery>("mavsdk/battery", 100);
-    odo_pub = nh.advertise<nav_msgs::Odometry>("mavsdk/odometry", 100);
-    velNedPos_pub = nh.advertise<mavsdk_interface::velocityNedPos>("mavsdk/velocityNedPos", 100);
-    flightMode_pub = nh.advertise<mavsdk_interface::flightMode>("mavsdk/flightMode", 100);
+    posGPS_pub = nh.advertise<mavsdk_interface::gpsPos>("t_mavsdk_node/mavsdk/gpsPos", 10);
+    battery_pub  = nh.advertise<mavsdk_interface::battery>("t_mavsdk_node/mavsdk/battery", 10);
+    odo_pub = nh.advertise<nav_msgs::Odometry>("t_mavsdk_node/mavsdk/odometry", 10);
+    velNedPos_pub = nh.advertise<mavsdk_interface::velocityNedPos>("t_mavsdk_node/mavsdk/velocityNedPos", 10);
+    flightMode_pub = nh.advertise<mavsdk_interface::flightMode>("t_mavsdk_node/mavsdk/flightMode", 10);
 
-    arm_srv = nh.advertiseService("mavsdk/service/arm", &Interface::isArmed, this);
-    takeoff_srv = nh.advertiseService("mavsdk/service/takeoff", &Interface::takeoff, this);
-    kill_srv = nh.advertiseService("mavsdk/service/kill", &Interface::kill, this);
-    go_srv = nh.advertiseService("mavsdk/service/go", &Interface::go, this);
+    arm_srv = nh.advertiseService("t_mavsdk_node/mavsdk/service/arm", &Interface::isArmed, this);
+    takeoff_srv = nh.advertiseService("t_mavsdk_node/mavsdk/service/takeoff", &Interface::takeoff, this);
+    kill_srv = nh.advertiseService("t_mavsdk_node/mavsdk/service/kill", &Interface::kill, this);
+    go_srv = nh.advertiseService("t_mavsdk_node/mavsdk/service/go", &Interface::go, this);
+    stopOffboard_srv = nh.advertiseService("t_mavsdk_node/mavsdk/service/stopOffboard", &Interface::stopOffboard, this);
 
     auto system = ConnectToDrone(mavsdk, udp);
 
@@ -69,23 +70,54 @@ bool Interface::kill(mavsdk_interface::kill::Request &req, mavsdk_interface::kil
 
 bool Interface::go(mavsdk_interface::go::Request &req, mavsdk_interface::go::Response &res)
 {
-    
     this->offboard->set_velocity_body({req.x, req.y, req.z, req.yaw});
     
 
-    // Start offboard mode.
-    mavsdk::Offboard::Result offboard_result = this->offboard->start();
-    if (offboard_result != mavsdk::Offboard::Result::Success) {
-            std::cerr << "Offboard::start() failed: " << offboard_result << '\n';
+    // Start offboard mode if not already set.
+    if(isOffboard == false)
+    {
+        mavsdk::Offboard::Result offboard_result = this->offboard->start();
+        if (offboard_result != mavsdk::Offboard::Result::Success) {
+                std::cerr << "Offboard::start() failed: " << offboard_result << '\n';
+                res.str2 = "Error: failed to start offboard";
+                return 0;
+        }
+        isOffboard = true;
     }
-
+    res.str2 = "succes!";
+    return 1;
 }
 
+bool Interface::stopOffboard(mavsdk_interface::stopOffboard::Request &req, mavsdk_interface::stopOffboard::Response &res)
+{
+    if(req.confirmation == false)
+    {
+        res.result = false;
+        return 1;
+    }
+
+    if(isOffboard == false)
+    {
+        res.result = true;
+        return 1;
+    }
+
+    auto result = this->offboard->stop();
+    if(result == mavsdk::Offboard::Result::Success)
+    {
+        res.result = true;
+        isOffboard = false;
+        return 1;
+    }
+
+    res.result = false;
+    return 0;
+}
 
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "t_mavsdk_node");
-    ros::NodeHandle nh("~");
+    ros::NodeHandle nh;
 
     // default port
     std::string port = "udp://:14540";
@@ -98,11 +130,8 @@ int main(int argc, char** argv)
     }
     ROS_INFO("Using mavlink_port: %s", port.c_str());
 
-    Interface Interface(nh, port);
+    auto interface = new Interface(nh, port);
   
-    ros::Rate loop_rate(ROS_RATE);
-    
-    
     ros::spin();
     return 0;
 }

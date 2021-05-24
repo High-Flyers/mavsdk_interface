@@ -15,6 +15,25 @@ InterfaceClient::~InterfaceClient()
 {
 }
 
+bool InterfaceClient::wait_for_call(ros::ServiceClient client)
+{
+    if(!client.waitForExistence(ros::Duration(5)))
+    {
+        ROS_ERROR("Failed to init call: %s", client.getService());
+        return false;
+    }
+    return true;
+}
+
+bool InterfaceClient::prepare_calls()
+{
+    return 
+        wait_for_call(arm_clt) &&
+        wait_for_call(takeoff_clt) &&
+        wait_for_call(kill_clt) &&
+        wait_for_call(go_clt);
+}
+
 bool InterfaceClient::call(char **argv)
 {
     if (argv[1] == "arm")
@@ -67,6 +86,10 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "interface_client");
     ros::NodeHandle nh;
     InterfaceClient client(nh);
+    if(!client.prepare_calls()) {
+        ROS_ERROR("Failed to connect!");
+        return 1;
+    }
     
     ROS_INFO(argv[1]);
     if (client.call(argv))
